@@ -22,13 +22,17 @@ int main() {
 
 	sf::Image img;
 	img.create(500, 500);
-	Vec3f deriv(1,1,1);
+	Vec3f deriv(0,0,0);
 	for(unsigned int x = 1; x < 500; x++){
 		for (unsigned int y = 1; y < 500; y++) {
 			sf::Uint8 value = std::floor((noise.eval(Vec3f((float)x/50, (float)y/50, (float)1/50), deriv)+1)/2*255);
 			img.setPixel(x, y, sf::Color(value,value,value));
 			if (x == 10) {
-				std::cout << noise.eval(Vec3f((float)x / 50, (float)y / 50, (float)1 / 50), deriv) << std::endl;
+				//std::cout << noise.eval(Vec3f((float)x / 50, (float)y / 50, (float)1 / 50), deriv) << std::endl;
+				std::cout << deriv.x << ", " << deriv.y << ", " << deriv.z << std::endl;
+			}
+			if (x > 250) {
+				img.setPixel(x, y, sf::Color((deriv.x + 1)/2*255, (deriv.y + 1) / 2 * 255, (deriv.z + 1) / 2 * 255));
 			}
 		}
 	}
@@ -43,7 +47,7 @@ int main() {
 	rect.setPosition(100, 100);
 	//rect.setFillColor(sf::Color::Red);
 	rect.setTexture(&texture);
-	rect.setSize(sf::Vector2f(200,200));
+	rect.setSize(sf::Vector2f(500,500));
 
 
 	//main loop

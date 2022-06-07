@@ -3,6 +3,7 @@
 
 PerlinNoise::PerlinNoise(const unsigned &seed)
 {	
+	//random generator setup
 	std::mt19937 generator(seed);
 	std::uniform_real_distribution<float> distribution;
 	auto dice = std::bind(distribution, generator);
@@ -10,19 +11,21 @@ PerlinNoise::PerlinNoise(const unsigned &seed)
 		//uniform distribution != uniform circle distribution
 		float theta = acos(2 * dice() - 1);
 		float phi = 2 * dice() * M_PI;
-
+		//makeing distribution on a critcle be uniform 
 		float x = cos(phi) * sin(theta);
 		float y = sin(phi) * sin(theta);
 		float z = cos(theta);
 		gradients[i] = Vec3f(x, y, z);
 		permutationTable[i] = i;
 	}
+	//one more random generator
 	std::uniform_int_distribution<unsigned> distributionInt;
 	auto diceInt = std::bind(distributionInt, generator);
-
+	//generation of random numbers in a table
 	for (unsigned i = 0; i < tableSize; i++) {
 		std::swap(permutationTable[i], permutationTable[diceInt() & tableSizeMask]);
 	}
+	//extending the size of a tble to have a 2d vector on each point
 	for (unsigned i = 0; i < tableSize; i++) {
 		permutationTable[tableSize + i] = permutationTable[i];
 	}
@@ -31,18 +34,23 @@ PerlinNoise::PerlinNoise(const unsigned &seed)
 PerlinNoise::~PerlinNoise() {};
 
 float PerlinNoise::eval(const Vec3f &pos, Vec3f &deriv) {
+	//finding the opening position inside our table
+	// usage of bitwise or insted of modulo (that why the table is a multiple of 2)
 	int xi0 = ((int)std::floor(pos.x)) & tableSizeMask;
 	int yi0 = ((int)std::floor(pos.y)) & tableSizeMask;
 	int zi0 = ((int)std::floor(pos.z)) & tableSizeMask;
 
+	// finding the closing position inside table
 	int xi1 = (xi0 + 1) & tableSizeMask;
 	int yi1 = (yi0 + 1) & tableSizeMask;
 	int zi1 = (zi0 + 1) & tableSizeMask;
 
+	// getting the exact position inside a cube
 	float tx = pos.x - ((int)std::floor(pos.x));
 	float ty = pos.y - ((int)std::floor(pos.y));
 	float tz = pos.z - ((int)std::floor(pos.z));
 
+	//interpolation 
 	float u = quintic(tx);
 	float v = quintic(ty);
 	float w = quintic(tz);
@@ -50,7 +58,7 @@ float PerlinNoise::eval(const Vec3f &pos, Vec3f &deriv) {
 	float x0 = tx, x1 = tx - 1;
 	float y0 = ty, y1 = ty - 1;
 	float z0 = tz, z1 = tz - 1;
-
+	//hashing for more randomness
 	float a = gradientDotV(hash(xi0, yi0, zi0), x0, y0, z0);
 	float b = gradientDotV(hash(xi1, yi0, zi0), x1, y0, z0);
 	float c = gradientDotV(hash(xi0, yi1, zi0), x0, y1, z0);
@@ -59,11 +67,11 @@ float PerlinNoise::eval(const Vec3f &pos, Vec3f &deriv) {
 	float f = gradientDotV(hash(xi1, yi0, zi1), x1, y0, z1);
 	float g = gradientDotV(hash(xi0, yi1, zi1), x0, y1, z1);
 	float h = gradientDotV(hash(xi1, yi1, zi1), x1, y1, z1);
-
+	//this i really dont understand but someone smart did the math and this is needed cuz we are not using linear interpolation ???
 	float du = quinticDeriv(tx);
 	float dv = quinticDeriv(ty);
 	float dw = quinticDeriv(tz);
-
+	//calculating the values from interpolation
 	float k0 = a;
 	float k1 = (b - a);
 	float k2 = (c - a);
@@ -72,7 +80,7 @@ float PerlinNoise::eval(const Vec3f &pos, Vec3f &deriv) {
 	float k5 = (a + f - b - e);
 	float k6 = (a + g - c - e);
 	float k7 = (b + c + e + h - a - d - f - g);
-
+	//getting the 
 	deriv.x = du * (k1 + k4 * v + k5 * w + k7 * v * w);
 	deriv.y = dv * (k2 + k4 * u + k6 * w + k7 * v * w);
 	deriv.z = dw * (k3 + k5 * u + k6 * v + k7 * v * w);
