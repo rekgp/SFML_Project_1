@@ -146,6 +146,7 @@
     <ClCompile Include="flowField.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="PerlinNoise.cpp" />
+    <ClCompile Include="Slider.cpp" />
     <ClCompile Include="vec.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="flowField.h" />
     <ClInclude Include="PerlinNoise.h" />
+    <ClInclude Include="Slider.h" />
     <ClInclude Include="vec.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
