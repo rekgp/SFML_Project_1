@@ -4,6 +4,7 @@
 #include <ctime>
 #include "vec.h"
 #include "PerlinNoise.h"
+#include "Slider.h"
 
 using namespace std;
 
@@ -29,7 +30,7 @@ int main() {
 			img.setPixel(x, y, sf::Color(value,value,value));
 			if (x == 10) {
 				//std::cout << noise.eval(Vec3f((float)x / 50, (float)y / 50, (float)1 / 50), deriv) << std::endl;
-				std::cout << deriv.x << ", " << deriv.y << ", " << deriv.z << std::endl;
+				//std::cout << deriv.x << ", " << deriv.y << ", " << deriv.z << std::endl;
 			}
 			if (x > 250) {
 				img.setPixel(x, y, sf::Color((deriv.x + 1)/2*255, (deriv.y + 1) / 2 * 255, (deriv.z + 1) / 2 * 255));
@@ -44,11 +45,18 @@ int main() {
 	texture.loadFromImage(img);
 
 	sf::RectangleShape rect;
-	rect.setPosition(100, 100);
+	rect.setPosition(300, 75);
 	//rect.setFillColor(sf::Color::Red);
 	rect.setTexture(&texture);
 	rect.setSize(sf::Vector2f(500,500));
 
+	Slider<float,sf::RectangleShape,void (sf::RectangleShape::*)(float)> slider(rect,&sf::RectangleShape::setRotation);
+	slider.setMinMax(360.0, 0.0);
+	slider.setPosition(sf::Vector2f(300, 50));
+	slider.setSize(sf::Vector2f(200, 50));
+	slider.setFillColor(sf::Color::Red, sf::Color::Blue);
+
+	
 
 	//main loop
 	while (window.isOpen()) {
@@ -64,6 +72,8 @@ int main() {
 			if (event.type == sf::Event::MouseWheelMoved) {
 				rect.setRotation(rect.getRotation() + event.mouseWheel.delta);
 			}
+			slider.check(event,window);
+			
 		}
 		// per frame calculations
 
@@ -72,6 +82,7 @@ int main() {
 		window.clear(sf::Color::Black);
 
 		window.draw(rect);
+		window.draw(slider);
 
 		window.display();
 
