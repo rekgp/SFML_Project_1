@@ -36,7 +36,6 @@ public:
 		_out << _vec.x << " " << _vec.y << " " << _vec.z << "; length :" << _vec.length() << std::endl;
 		return _out;
 	};
-
 	T x, y, z;
 };
 

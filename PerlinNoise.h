@@ -1,6 +1,6 @@
 #pragma once
 #define _USE_MATH_DEFINES
-#include "vec.h"
+#include "vec3.h"
 #include <random>
 #include <functional>
 #include <cmath>

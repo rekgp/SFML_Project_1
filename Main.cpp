@@ -2,7 +2,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <ctime>
-#include "vec.h"
+#include "vec3.h"
 #include "PerlinNoise.h"
 #include "Slider.h"
 
