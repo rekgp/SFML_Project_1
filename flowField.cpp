@@ -7,7 +7,7 @@ flowField::flowField(sf::RenderWindow *_window,const int &_nx,const int &_ny, co
 	for (int x = 0; x < grid.size() -1; x++) {
 		for (int y = 0; y < grid[x].size(); y++) {
 			Vec3f deriv(0,0,0);
-			float var = noise.eval(Vec3f(x * scale, y * scale, 1.0), deriv)+1;
+			float var = noise.eval(Vec3f(x * scale, y * scale, 1.0), deriv);
 			grid[x][y] = std::pair<Vec2f,float>{Vec2f(std::cos(var * M_PI), std::sin(var * M_PI)),var * 360};
 		}
 	}
@@ -80,31 +80,50 @@ void flowField::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 }
 
-void flowField::update(sf::Time)
+void flowField::update(sf::Time elapsed)
 {
+	auto windowSize = window->getSize();
+	int x = 0;
+	int y = 0;
+	if (yAnimation) {
+		Time += elapsed;
+		for (int x = 0; x < grid.size(); x++) {
+			for (int y = 0; y < grid[x].size(); y++) {
+				Vec3f deriv(0, 0, 0);
+				float var = (noise.eval(Vec3f(x * scale, y * scale, Time.asSeconds() * ySpeed), deriv));
+				if (x == 1 && y == 1) {
+					//std::cerr << var << std::endl;
+				}
+				grid[x][y] = std::pair<Vec2f, float>{ Vec2f(std::cos(var * M_PI), std::sin(var * M_PI)),var * 360 };
+			}
+		}
+	}
+	for (auto row = visualVectors.begin(); row != visualVectors.end(); row++) {
+		for (auto col = row->begin(); col != row->end(); col++) {
+			col->setRotation(grid[x][y].second);
+			y++;
+		}
+		y = 0;
+		x++;
+	}
 }
 
-Vec2f flowField::getVelocityVector(const Vec3f& _pos)
-{
-	return Vec2f();
+Vec2f flowField::getVelocityVector(const Vec2f& _pos)
+{	
+	auto windowSize = window->getSize();
+	std::cerr << _pos.x << ", " << _pos.y << std::endl;
+	int x = (int) (_pos.x +  windowSize.x / nx /2) * nx / windowSize.x;
+	int y = (int) (_pos.y +  windowSize.y / ny /2) * ny / windowSize.y;
+	return grid[x][y].first;
 }
 
 void flowField::recalc()
 {	
-		
-	visualVectors.resize(this->nx, std::vector<sf::RectangleShape> (ny));
 	for (int x = 0; x < grid.size(); x++) {
 		for (int y = 0; y < grid[x].size(); y++) {
 			Vec3f deriv(0, 0, 0);
-			float var = noise.eval(Vec3f(x * scale, y * scale, 1.0), deriv) + 1;
-			grid[y][x] = std::pair<Vec2f, float>{ Vec2<float>(std::cos(var * M_PI), std::sin(var * M_PI)),var * 360};
-		}
-	}
-	if (visualize) {
-		for (int x = 0; x < visualVectors.size(); x++) {
-			for (int y = 0; x < ny; y++) {
-				visualVectors[x][y].setRotation(grid[x][y].second);
-			}
+			float var = noise.eval(Vec3f(x * scale, y * scale, 1.0), deriv);
+			grid[x][y] = std::pair<Vec2f, float>{ Vec2f(std::cos(var * M_PI), std::sin(var * M_PI)),var * 360 };
 		}
 	}
 }
@@ -112,43 +131,22 @@ void flowField::recalc()
 void flowField::resize()
 {
 	grid.resize(this->nx, std::vector<std::pair<Vec2f, float>>(ny));
-	//std::cerr << "Grid resized to:" << grid.size() << ", " << grid[grid.size()].size() << std::endl;
-	//for (int x = 0; x < this->nx; x++) {
-	//	std::vector<std::pair<Vec2f, float>> variable;
-	//	for (int y = 0; y < this->ny; y++) {
-	//		variable.push_back(std::pair)
-	//	}
-	//}
-
-
 	visualVectors.resize(this->nx, std::vector<sf::RectangleShape> (ny, sf::RectangleShape()));
-
-	//std::cerr << "visualVectors resized to:" << visualVectors.size() << ", " << visualVectors[visualVectors.size()].size() << std::endl;
-	for (int i = 0; i < visualVectors.size(); i++) {
-		std::cerr << visualVectors.size() << ", " << visualVectors[i].size() << std::endl;
-	}
+	recalc();
 	auto windowSize = window->getSize();
-	std::cerr << visualVectors.size();
-	auto gridrow = grid.begin();
 	int x = 0;
 	int y = 0;
 	for (auto row = visualVectors.begin(); row != visualVectors.end(); row++) {
-		auto gridcol = gridrow->begin();
 		for (auto col = row->begin(); col != row->end(); col++) {
 			
-			col->setSize(sf::Vector2f(20, 3));
+			col->setSize(sf::Vector2f(16, 4));
 			col->setOrigin(sf::Vector2f(0, col->getSize().y / 2));
 			col->setFillColor(sf::Color::White);
 			col->setPosition(sf::Vector2f((float)x * windowSize.x/nx,(float) y * windowSize.y/ny));
 			col->setRotation(grid[x][y].second);
-				//std::cerr << x << ", " << y << std::endl;
-				//visualVectors[x][y].setPosition(sf::Vector2f(grid[x][y].first.x * windowSize.x, grid[x][y].first.y * windowSize.y));
-				//visualVectors[x][y].setRotation(grid[x][y].second);
-			gridcol++;
 			y++;
 		}
 		y = 0;
-		gridrow++;
 		x++;
 	}
 }

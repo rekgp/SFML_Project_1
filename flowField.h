@@ -20,8 +20,8 @@ public:
 	void setAnimationSpeed(const float& _speed);
 	void setDrawable(const bool& _arg);
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-	void update(sf::Time);
-	Vec2f getVelocityVector(const Vec3f& _pos);
+	void update(sf::Time elapsed);
+	Vec2f getVelocityVector(const Vec2f& _pos);
 
 private:
 	std::vector <std::vector<std::pair<Vec2f,float>>> grid;
@@ -36,6 +36,7 @@ private:
 
 	float ySpeed;
 	bool yAnimation;
+	sf::Time Time;
 	
 	void recalc();
 	void resize();

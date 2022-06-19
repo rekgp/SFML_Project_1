@@ -22,8 +22,10 @@ int main() {
 
 	PerlinNoise noise;
 
-	flowField flowfield(&window,5,5,2022);
+	flowField flowfield(&window,10,10,2022);
 	flowfield.setDrawable(1);
+	flowfield.setAnimation(1);
+	flowfield.setAnimationSpeed(0.2);
 
 	sf::Image img;
 	img.create(500, 500);
@@ -73,15 +75,20 @@ int main() {
 				std::cout << "Closing Window" << std::endl;
 				window.close();
 			}
-			if (event.type == sf::Event::MouseWheelMoved) {
+			else if (event.type == sf::Event::MouseWheelMoved) {
 				rect.setRotation(rect.getRotation() + event.mouseWheel.delta);
+			}
+			else if (event.type == sf::Event::EventType::MouseButtonPressed) {
+				auto mouse = sf::Mouse::getPosition(window);
+				std::cerr << "mouse hit ????" << std::endl;
+				flowfield.getVelocityVector(Vec2f(mouse.x, mouse.y));
 			}
 			slider.check(event,window);
 			
 		}
 		// per frame calculations
 
-
+		flowfield.update(elapsed);
 		//draw everyting
 		window.clear(sf::Color::Black);
 
