@@ -2,9 +2,10 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 #include <ctime>
-#include "vec3.h"
+#include "Vec3.h"
 #include "PerlinNoise.h"
 #include "Slider.h"
+#include "flowField.h"
 
 using namespace std;
 
@@ -20,6 +21,9 @@ int main() {
 	sf::Clock clock;
 
 	PerlinNoise noise;
+
+	flowField flowfield(&window,5,5,2022);
+	flowfield.setDrawable(1);
 
 	sf::Image img;
 	img.create(500, 500);
@@ -83,7 +87,7 @@ int main() {
 
 		window.draw(rect);
 		window.draw(slider);
-
+		window.draw(flowfield);
 		window.display();
 
 	}

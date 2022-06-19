@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "vec3.h"
+#include "Vec3.h"
 #include "flowField.h"
 
 class Particle :
