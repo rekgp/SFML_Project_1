@@ -6,6 +6,7 @@
 #include "PerlinNoise.h"
 #include "Slider.h"
 #include "flowField.h"
+#include "Particle.h"
 
 using namespace std;
 
@@ -20,48 +21,16 @@ int main() {
 
 	sf::Clock clock;
 
-	PerlinNoise noise;
-
 	flowField flowfield(&window,10,10,2022);
 	flowfield.setDrawable(1);
 	flowfield.setAnimation(1);
 	flowfield.setAnimationSpeed(0.2);
 
-	sf::Image img;
-	img.create(500, 500);
-	Vec3f deriv(0,0,0);
-	for(unsigned int x = 1; x < 500; x++){
-		for (unsigned int y = 1; y < 500; y++) {
-			sf::Uint8 value = std::floor((noise.eval(Vec3f((float)x/50, (float)y/50, (float)1/50), deriv)+1)/2*255);
-			img.setPixel(x, y, sf::Color(value,value,value));
-			if (x == 10) {
-				//std::cout << noise.eval(Vec3f((float)x / 50, (float)y / 50, (float)1 / 50), deriv) << std::endl;
-				//std::cout << deriv.x << ", " << deriv.y << ", " << deriv.z << std::endl;
-			}
-			if (x > 250) {
-				img.setPixel(x, y, sf::Color((deriv.x + 1)/2*255, (deriv.y + 1) / 2 * 255, (deriv.z + 1) / 2 * 255));
-			}
-		}
-	}
-	for (unsigned int x = 0; x < 500; x++) {
-		img.setPixel(x, 1, sf::Color::Yellow);
-	}
-
-	sf::Texture texture;
-	texture.loadFromImage(img);
-
-	sf::RectangleShape rect;
-	rect.setPosition(300, 75);
-	//rect.setFillColor(sf::Color::Red);
-	rect.setTexture(&texture);
-	rect.setSize(sf::Vector2f(500,500));
-
-	Slider<float,sf::RectangleShape,void (sf::RectangleShape::*)(float)> slider(rect,&sf::RectangleShape::setRotation);
-	slider.setMinMax(360.0, 0.0);
-	slider.setPosition(sf::Vector2f(300, 50));
-	slider.setSize(sf::Vector2f(200, 50));
-	slider.setFillColor(sf::Color::Red, sf::Color::Blue);
-
+	Particle atoms(flowfield);
+	atoms.shape = new sf::RectangleShape(sf::Vector2f(5, 5));
+	atoms.setParticleDrawing(1);
+	atoms.setMaxSpeed(10.0);
+	atoms.setWindow(&window);
 	
 
 	//main loop
@@ -75,26 +44,17 @@ int main() {
 				std::cout << "Closing Window" << std::endl;
 				window.close();
 			}
-			else if (event.type == sf::Event::MouseWheelMoved) {
-				rect.setRotation(rect.getRotation() + event.mouseWheel.delta);
-			}
-			else if (event.type == sf::Event::EventType::MouseButtonPressed) {
-				auto mouse = sf::Mouse::getPosition(window);
-				std::cerr << "mouse hit ????" << std::endl;
-				flowfield.getVelocityVector(Vec2f(mouse.x, mouse.y));
-			}
-			slider.check(event,window);
 			
 		}
 		// per frame calculations
 
 		flowfield.update(elapsed);
+		atoms.update(elapsed);
 		//draw everyting
 		window.clear(sf::Color::Black);
 
-		window.draw(rect);
-		window.draw(slider);
 		window.draw(flowfield);
+		window.draw(atoms);
 		window.display();
 
 	}

@@ -4,7 +4,7 @@ flowField::flowField(sf::RenderWindow *_window,const int &_nx,const int &_ny, co
 {	
 	resize();
 	this->scale = 1.1;
-	for (int x = 0; x < grid.size() -1; x++) {
+	for (int x = 0; x < grid.size(); x++) {
 		for (int y = 0; y < grid[x].size(); y++) {
 			Vec3f deriv(0,0,0);
 			float var = noise.eval(Vec3f(x * scale, y * scale, 1.0), deriv);
@@ -32,7 +32,7 @@ flowField::~flowField()
 
 void flowField::setWindow(sf::RenderWindow *_window)
 {
-	_window = window;
+	window = _window;
 }
 
 void flowField::setScale(const float& _scale)
@@ -114,6 +114,12 @@ Vec2f flowField::getVelocityVector(const Vec2f& _pos)
 	std::cerr << _pos.x << ", " << _pos.y << std::endl;
 	int x = (int) (_pos.x +  windowSize.x / nx /2) * nx / windowSize.x;
 	int y = (int) (_pos.y +  windowSize.y / ny /2) * ny / windowSize.y;
+	if (x > nx - 1) {
+		x = 0;
+	}
+	if (y > ny - 1) {
+		y = 0;
+	}
 	return grid[x][y].first;
 }
 
