@@ -8,7 +8,7 @@ flowField::flowField(sf::RenderWindow *_window,const int &_nx,const int &_ny, co
 		for (int y = 0; y < grid[x].size(); y++) {
 			Vec3f deriv(0,0,0);
 			float var = noise.eval(Vec3f(x * scale, y * scale, 1.0), deriv);
-			grid[x][y] = std::pair<Vec2f,float>{Vec2f(std::cos(var * M_PI), std::sin(var * M_PI)),var * 360};
+			grid[x][y] = std::pair<Vec2f,float>{Vec2f(std::cos(var * 2 * M_PI), std::sin(var * 2 * M_PI)),var * 360};
 		}
 	}
 	resize();
@@ -94,7 +94,7 @@ void flowField::update(sf::Time elapsed)
 				if (x == 1 && y == 1) {
 					//std::cerr << var << std::endl;
 				}
-				grid[x][y] = std::pair<Vec2f, float>{ Vec2f(std::cos(var * M_PI), std::sin(var * M_PI)),var * 360 };
+				grid[x][y] = std::pair<Vec2f, float>{ Vec2f(std::cos(var * 2 * M_PI), std::sin(var * 2 * M_PI)),var * 360 };
 			}
 		}
 	}
@@ -111,9 +111,9 @@ void flowField::update(sf::Time elapsed)
 Vec2f flowField::getVelocityVector(const Vec2f& _pos)
 {	
 	auto windowSize = window->getSize();
-	std::cerr << _pos.x << ", " << _pos.y << std::endl;
-	int x = (int) (_pos.x +  windowSize.x / nx /2) * nx / windowSize.x;
-	int y = (int) (_pos.y +  windowSize.y / ny /2) * ny / windowSize.y;
+	//std::cerr << _pos.x << ", " << _pos.y << std::endl;
+	int x = (int) (_pos.x /* + windowSize.x / nx / 2*/ ) * nx / windowSize.x;
+	int y = (int) (_pos.y /* + windowSize.y / ny / 2 */ ) * ny / windowSize.y;
 	if (x > nx - 1) {
 		x = 0;
 	}
@@ -129,7 +129,7 @@ void flowField::recalc()
 		for (int y = 0; y < grid[x].size(); y++) {
 			Vec3f deriv(0, 0, 0);
 			float var = noise.eval(Vec3f(x * scale, y * scale, 1.0), deriv);
-			grid[x][y] = std::pair<Vec2f, float>{ Vec2f(std::cos(var * M_PI), std::sin(var * M_PI)),var * 360 };
+			grid[x][y] = std::pair<Vec2f, float>{ Vec2f(std::cos(var * 2 * M_PI), std::sin(var * 2 * M_PI)),var * 360 };
 		}
 	}
 }

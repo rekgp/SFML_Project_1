@@ -3,7 +3,7 @@
 
 Particle::Particle(flowField& flow) : field(flow)
 {
-	pos = Vec2f(10, 10);
+	pos = Vec2f(400, 300);
 	vel = Vec2f(0, 0);
 }
 
@@ -34,6 +34,7 @@ void Particle::setMaxSpeed(const float& _max)
 void Particle::update(sf::Time elapsed)
 {
 	vel = math(field.getVelocityVector(pos));
+	prevpos = pos;
 	pos = pos + (vel * maxspeed * elapsed.asSeconds());
 	//std::cerr << "Vel= " << vel.x << ", " << vel.y << "Pos= " << pos.x << ", " << pos.y << std::endl;
 	auto windowSize = window->getSize();
@@ -53,7 +54,17 @@ void Particle::update(sf::Time elapsed)
 	shape->setPosition(sf::Vector2f(pos.x, pos.y));
 
 	if (drawTrail) {
-		//do the thing iwth the traingle strips or something
+		Vec2f deltapos = pos - prevpos;
+		Vec2f vecone = Vec2f(deltapos.y, -deltapos.x);
+		Vec2f vectwo = Vec2f(-deltapos.y, deltapos.x);
+		vecone.normalize();
+		vectwo.normalize();
+		vecone = vecone * 1;
+		vectwo = vectwo * 1;
+		sf::Vertex one(sf::Vertex(sf::Vector2f(pos.x + vecone.x, pos.y + vecone.y),sf::Color::Blue));
+		sf::Vertex two(sf::Vertex(sf::Vector2f(pos.x + vectwo.x, pos.y + vectwo.y),sf::Color::Blue));
+		trail.emplace_back(one);
+		trail.emplace_back(two);
 	}
 }
 
@@ -63,14 +74,15 @@ void Particle::draw(sf::RenderTarget& target, sf::RenderStates states) const
 		target.draw(*shape);
 	}
 	if (drawTrail) {
-		target.draw(trail);
+		target.draw(&trail[0], trail.size(), sf::TriangleStrip);
 	}
 
 }
 
 Vec2f Particle::math(const Vec2f& _vec)
-{
-	Vec2f var = vel + Vec2f(_vec.x * 0.1,_vec.y * 0.1);
+{	
+	float dot = vel.dot(_vec);
+	Vec2f var = vel + _vec;
 	//std::cerr << "normalized vec " << var.x << ", " << var.y << std::endl;
 	var.normalize();
 	var* maxspeed;

@@ -24,12 +24,14 @@ int main() {
 	flowField flowfield(&window,10,10,2022);
 	flowfield.setDrawable(1);
 	flowfield.setAnimation(1);
-	flowfield.setAnimationSpeed(0.2);
+	flowfield.setAnimationSpeed(0.5);
+	flowfield.setScale(0.09);
 
 	Particle atoms(flowfield);
 	atoms.shape = new sf::RectangleShape(sf::Vector2f(5, 5));
 	atoms.setParticleDrawing(1);
-	atoms.setMaxSpeed(10.0);
+	atoms.setTrailDrawing(1);
+	atoms.setMaxSpeed(40.0);
 	atoms.setWindow(&window);
 	
 

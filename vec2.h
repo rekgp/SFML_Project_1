@@ -166,6 +166,12 @@ inline Vec2<T> Vec2<T>::operator/=(const T& _val)
 }
 
 template<typename T>
+inline float Vec2<T>::dot(const Vec2& _vec) const
+{
+	return x * _vec.x + y * _vec.y;
+}
+
+template<typename T>
 inline float Vec2<T>::length() const
 {
 	return sqrt(x*x+y*y);

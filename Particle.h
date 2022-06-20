@@ -25,8 +25,9 @@ public:
     sf::Shape* shape;
 protected:
     Vec2<float> pos, vel;
+    Vec2f prevpos;
     bool drawPart, drawTrail;
-    sf::VertexArray trail;
+    std::vector<sf::Vertex> trail;
     flowField& field;
     float maxspeed;
     sf::RenderWindow* window;
